@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from datetime import timedelta
 import dotenv 
 
 dotenv.load_dotenv()
@@ -44,8 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
+    'rest_framework_simplejwt',
     'django_filters',
     'storages',
+    ''
     
     # My apps
     'product'
@@ -99,9 +102,18 @@ DATABASES = {
 # exception handling
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.custom_exception_handler.custom_exception_handler',
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
-    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    # "SIGNING_KEY": SECRET_KEY,
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer', ),
+    'AUTH_TOKEN_CLASSES': ("rest_framework_simplejwt.tokens.AccessToken", ), 
 }
 
 
@@ -152,12 +164,18 @@ AWS_STORAGE_BUCKET_NAME=os.environ.get('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_SIGNATURE_VERSION='s3v4'
 AWS_REGION_NAME=os.environ.get('AWS_REGION_NAME')
 AWS_S3_FILE_OVERWRITE=False
-AWS_DEFAULT_ACL=None
+AWS_DEFAULT_ACL='public-read'
 AWS_S3_VERIFY=True
 
 
-# Storage settings
-STORAGES = {"default": "storages.backends.s3boto3.S3Boto3Storage"}
-STORAGES = {"staticfiles" : "storages.backends.s3boto3.S3StaticStorage"}
+# Storage Backend Configuration
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",  # Optional: For serving static files from S3
+    },
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

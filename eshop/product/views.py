@@ -1,10 +1,12 @@
 # Django imports
 from django.shortcuts import get_object_or_404
 
+
 # Django-REST-Framework imports
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework import status
 
 # 
 from .models import Product, ProductImages
@@ -61,3 +63,65 @@ def upload_product_images(request):
     serializer = ProductImageSerializer(images, many=True)
     
     return Response(serializer.data)
+
+
+# New Product
+@api_view(['POST'])
+def new_product(request):
+    data = request.data
+    
+    serializer = ProductSerializer(data=data)
+    
+    if serializer.is_valid():
+        
+        product = Product.objects.create(**data)
+        
+        res = ProductSerializer(product, many=False)
+        
+        return Response({'product': res.data})
+    else:
+        
+        return Response(serializer.errors, status=400)
+    
+
+@api_view(['PUT'])
+# @permission_classes([IsAuthenticated])
+def update_product(request, pk):
+    product = get_object_or_404(Product, id=pk)
+    
+    # Check if the user is same - todo 
+    # if product.user != request.user:
+    #     return Response({'error': 'You are not authorized to update this product'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    product.name = request.data['name']
+    product.price = request.data['price']
+    product.description = request.data['description']
+    product.brand = request.data['brand']
+    product.category = request.data['category']
+    product.stock = request.data['stock']
+    product.ratings = request.data['ratings']
+    
+    product.save()
+    
+    serializer = ProductSerializer(product, many=False)
+    return Response({'product': serializer.data})
+
+
+@api_view(['DELETE'])
+# @permission_classes([IsAuthenticated])
+def delete_product(request, pk):
+    product = get_object_or_404(Product, id=pk)
+    
+    # Check if the user is same - todo
+    # if product.user != request.user:
+    #     return Response({'error': 'You are not authorized to delete this product'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    # Deleting images with signals
+    args = { "product": pk}
+    images = ProductImages.objects.filter(**args)
+    for image in images:
+        image.delete()
+        
+    product.delete()
+    
+    return Response({ 'details': 'Product is deleted' }, status=status.HTTP_204_NO_CONTENT)

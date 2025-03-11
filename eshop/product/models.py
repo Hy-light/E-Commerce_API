@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 # Create your models here.
 class Category(models.TextChoices):
@@ -32,3 +34,11 @@ class ProductImages(models.Model):
     
     def __str__(self):
         return self.product.name
+    
+    
+# Signal to delete related images when product is deleted
+@receiver(post_delete, sender = ProductImages)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    if instance.image:
+        instance.image.delete(save=False)
+    
