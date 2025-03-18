@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from datetime import timedelta, datetime
 
 from .serializers import SignUpSerializer, UserSerializer
+from utils.helpers import get_current_host
  
 #  Views
 @api_view(['POST'])
@@ -66,13 +67,6 @@ def update_user(request):
     updated_user = UserSerializer(user, many=False)
     
     return Response(updated_user.data)
-
-
-# get current host function
-def get_current_host(request):
-    protocol = request.is_secure() and 'https' or 'http'
-    host = request.get_host()
-    return f'{protocol}://{host}/'.format(host=host, protocol=protocol)
 
 
 # Reset password

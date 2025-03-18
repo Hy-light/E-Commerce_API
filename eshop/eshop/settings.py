@@ -31,7 +31,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG') == 'True'
 # DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -48,11 +48,12 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'storages',
-    ''
+    
     
     # My apps
     'product',
-    'account'
+    'account',
+    'order',
 ]
 
 MIDDLEWARE = [
@@ -176,8 +177,9 @@ AWS_STORAGE_BUCKET_NAME=os.environ.get('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_SIGNATURE_VERSION='s3v4'
 AWS_REGION_NAME=os.environ.get('AWS_REGION_NAME')
 AWS_S3_FILE_OVERWRITE=False
-AWS_DEFAULT_ACL='public-read'
+AWS_DEFAULT_ACL=None
 AWS_S3_VERIFY=True
+
 
 
 # Storage Backend Configuration
@@ -186,7 +188,8 @@ STORAGES = {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
     },
     "staticfiles": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",  # Optional: For serving static files from S3
+        # "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",  # Optional: For serving static files from S3
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
