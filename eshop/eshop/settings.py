@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 import dotenv 
+import psycopg2
 
 dotenv.load_dotenv()
 
@@ -31,7 +32,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG') == 'True'
 # DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['', 'localhost']
 
 
 # Application definition
@@ -112,6 +113,16 @@ DATABASES = {
     }
 }
 
+# I added this to connect to the database in aws
+# """
+# conn = psycopg2.connect(
+# host=os.environ.get('DATABASE_HOST'),
+# port=os.environ.get('DATABASE_PORT'),
+# dbname=os.environ.get('DATABASE_NAME'),
+# user=os.environ.get('DATABASE_USER'),
+# password=os.environ.get('DATABASE_PASSWORD')
+# """
+
 # exception handling
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.custom_exception_handler.custom_exception_handler',
@@ -164,7 +175,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+# deployment configuration
+STATIC_ROOT = 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
